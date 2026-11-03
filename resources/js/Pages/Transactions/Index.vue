@@ -5,7 +5,6 @@ import { Head, Link } from '@inertiajs/vue3';
 defineProps({ transactions: Object });
 
 const printTransaction = (trx) => {
-    // Membuat area cetak khusus
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
         <html>
@@ -28,7 +27,7 @@ const printTransaction = (trx) => {
             <body>
                 <div class="header">
                     <h1>SURAT JALAN / BUKTI TRANSAKSI</h1>
-                    <p>WMS BALDE - Sistem Manajemen Gudang</p>
+                    <p>WMS BLAADE - Sistem Manajemen Gudang</p>
                 </div>
                 <table class="details">
                     <tr><th>No. Transaksi</th><td>#TRX-${trx.id}</td></tr>
@@ -59,44 +58,49 @@ const printTransaction = (trx) => {
     <Head title="Riwayat Transaksi" />
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Riwayat Transaksi Gudang</h2>
+            <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight">Riwayat Transaksi Gudang</h2>
         </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="mb-4">
-                        <Link :href="route('transactions.create')" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">+ Buat Transaksi Baru</Link>
+        <div class="py-8 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
+                    
+                    <div class="mb-6 flex justify-between items-center">
+                        <Link :href="route('transactions.create')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all transform hover:scale-105 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Buat Transaksi Baru
+                        </Link>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-gray-200">
-                            <thead class="bg-gray-100">
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+                        <table class="min-w-full bg-white dark:bg-gray-800">
+                            <thead class="bg-gray-50 dark:bg-gray-700/50">
                                 <tr>
-                                    <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">Tanggal</th>
-                                    <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">Produk</th>
-                                    <th class="py-3 px-4 border-b text-center text-sm font-semibold text-gray-600">Tipe</th>
-                                    <th class="py-3 px-4 border-b text-center text-sm font-semibold text-gray-600">Qty</th>
-                                    <th class="py-3 px-4 border-b text-center text-sm font-semibold text-gray-600">Aksi</th>
+                                    <th class="py-4 px-4 border-b dark:border-gray-700 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Tanggal</th>
+                                    <th class="py-4 px-4 border-b dark:border-gray-700 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Produk</th>
+                                    <th class="py-4 px-4 border-b dark:border-gray-700 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Tipe</th>
+                                    <th class="py-4 px-4 border-b dark:border-gray-700 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Qty</th>
+                                    <th class="py-4 px-4 border-b dark:border-gray-700 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr v-for="trx in transactions.data" :key="trx.id" class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 border-b">{{ new Date(trx.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) }}</td>
-                                    <td class="py-3 px-4 border-b font-medium">{{ trx.product?.name }}</td>
-                                    <td class="py-3 px-4 border-b text-center">
-                                        <span v-if="trx.type === 'in'" class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-green-300">MASUK</span>
-                                        <span v-else class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-red-300">KELUAR</span>
+                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                                <tr v-for="trx in transactions.data" :key="trx.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                    <td class="py-4 px-4 text-sm text-gray-600 dark:text-gray-300">{{ new Date(trx.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) }}</td>
+                                    <td class="py-4 px-4 text-sm font-bold text-gray-800 dark:text-gray-100">{{ trx.product?.name }}</td>
+                                    <td class="py-4 px-4 text-center">
+                                        <span v-if="trx.type === 'in'" class="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full border border-green-200 dark:border-green-800">MASUK</span>
+                                        <span v-else class="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold px-3 py-1 rounded-full border border-red-200 dark:border-red-800">KELUAR</span>
                                     </td>
-                                    <td class="py-3 px-4 border-b text-center font-bold">{{ trx.quantity }}</td>
-                                    <td class="py-3 px-4 border-b text-center">
-                                        <button @click="printTransaction(trx)" class="text-blue-600 hover:text-blue-900 font-semibold border border-blue-600 px-3 py-1 rounded">
-                                            🖨️ Cetak
+                                    <td class="py-4 px-4 text-center text-sm font-black text-gray-800 dark:text-gray-100">{{ trx.quantity }}</td>
+                                    <td class="py-4 px-4 text-center">
+                                        <button @click="printTransaction(trx)" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 font-bold text-xs px-4 py-2 rounded-lg transition-colors border border-gray-200 dark:border-gray-600 flex items-center justify-center gap-2 mx-auto">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                            Cetak
                                         </button>
                                     </td>
                                 </tr>
                                 <tr v-if="transactions.data.length === 0">
-                                    <td colspan="5" class="text-center py-6 text-gray-500">Belum ada riwayat transaksi.</td>
+                                    <td colspan="5" class="text-center py-8 text-gray-500 dark:text-gray-400">Belum ada riwayat transaksi.</td>
                                 </tr>
                             </tbody>
                         </table>
