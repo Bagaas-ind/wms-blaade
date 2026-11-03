@@ -1,27 +1,23 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace App\Models;
 
-return new class extends Migration
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Transaction extends Model
 {
-    public function up(): void
+    use HasFactory;
+
+    protected $guarded = ['id'];
+
+    public function product()
     {
-        Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('type', ['in', 'out']); 
-            $table->integer('quantity');
-            $table->date('date');
-            $table->text('note')->nullable(); 
-            $table->timestamps();
-        });
+        return $this->belongsTo(Product::class);
     }
 
-    public function down(): void
+    public function user()
     {
-        Schema::dropIfExists('transactions');
+        return $this->belongsTo(User::class);
     }
-};
+}

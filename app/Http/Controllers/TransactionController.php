@@ -10,19 +10,33 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Mengambil riwayat beserta nama produk dan nama user yang input
-        $transactions = Transaction::with(['product', 'user'])->latest()->paginate(10);
+        $query = Transaction::with(['product', 'user']);
+
+        if ($request->search) {
+            $query->where(function($q) use ($request) {
+                $q->where('note', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('product', function($q2) use ($request) {
+                      $q2->where('name', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
+        if ($request->start_date && $request->end_date) {
+            $query->whereBetween('date', [$request->start_date, $request->end_date]);
+        }
+
+        $transactions = $query->latest()->paginate(10)->withQueryString();
         
         return Inertia::render('Transactions/Index', [
-            'transactions' => $transactions
+            'transactions' => $transactions,
+            'filters' => $request->only(['search', 'start_date', 'end_date']),
         ]);
     }
 
     public function create()
     {
-        // Mengirim data produk untuk pilihan di dropdown
         return Inertia::render('Transactions/Create', [
             'products' => Product::all()
         ]);
@@ -40,26 +54,23 @@ class TransactionController extends Controller
 
         $product = Product::findOrFail($request->product_id);
 
-        // LOGIKA WMS: Cek stok jika barang keluar
         if ($request->type == 'out' && $product->stock < $request->quantity) {
             return back()->withErrors(['quantity' => 'Stok tidak mencukupi! Sisa stok saat ini: ' . $product->stock])->withInput();
         }
 
-        // 1. Simpan riwayat transaksi
         Transaction::create([
             'product_id' => $request->product_id,
-            'user_id' => Auth::id(), // Otomatis mencatat siapa yang login
+            'user_id' => Auth::id(),
             'type' => $request->type,
             'quantity' => $request->quantity,
             'date' => $request->date,
             'note' => $request->note,
         ]);
 
-        // 2. Update stok di tabel produk
         if ($request->type == 'in') {
-            $product->increment('stock', $request->quantity); // Stok nambah
+            $product->increment('stock', $request->quantity);
         } else {
-            $product->decrement('stock', $request->quantity); // Stok ngurang
+            $product->decrement('stock', $request->quantity);
         }
 
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diproses! Stok telah diperbarui.');
