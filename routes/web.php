@@ -4,13 +4,22 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController; // Tambahan untuk Kategori
 use App\Http\Controllers\SupplierController; // Tambahan untuk Supplier
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+use App\Models\Category;
+use App\Models\Supplier;
+use App\Models\Product;
+
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $totalKategori = Category::count();
+    $totalSupplier = Supplier::count();
+    $totalProduk = Product::count();
+    
+    return view('dashboard', compact('totalKategori', 'totalSupplier', 'totalProduk'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -22,6 +31,7 @@ Route::middleware('auth')->group(function () {
     // --- Tambahan Kita (Sistem Gudang) ---
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
+    Route::resource('products', ProductController::class); // <-- TAMBAHKAN INI
 });
 
 require __DIR__.'/auth.php';
