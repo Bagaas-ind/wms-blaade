@@ -1,37 +1,40 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CategoryController; // Tambahan untuk Kategori
-use App\Http\Controllers\SupplierController; // Tambahan untuk Supplier
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TransactionController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 });
 
-use App\Models\Category;
-use App\Models\Supplier;
-use App\Models\Product;
-
 Route::get('/dashboard', function () {
-    $totalKategori = Category::count();
-    $totalSupplier = Supplier::count();
-    $totalProduk = Product::count();
-    
-    return view('dashboard', compact('totalKategori', 'totalSupplier', 'totalProduk'));
+    return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    // --- Bawaan Laravel Breeze (JANGAN DIHAPUS) ---
+    // Rute Profile Bawaan
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // --- Tambahan Kita (Sistem Gudang) ---
+    // --- RUTE SISTEM GUDANG KITA ---
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
-    Route::resource('products', ProductController::class); // <-- TAMBAHKAN INI
+    Route::resource('products', ProductController::class);
+    
+    // Rute transaksi (kita batasi hanya index, create, store)
+    Route::resource('transactions', TransactionController::class)->except(['edit', 'update', 'destroy']);
 });
 
 require __DIR__.'/auth.php';

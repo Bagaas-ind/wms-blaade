@@ -6,21 +6,26 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Inertia\Inertia; // PENTING
 
 class ProductController extends Controller
 {
     public function index()
     {
-        // Mengambil produk beserta relasi kategori dan supplier-nya
+        // Menarik data produk beserta relasinya
         $products = Product::with(['category', 'supplier'])->latest()->paginate(10);
-        return view('products.index', compact('products'));
+        return Inertia::render('Products/Index', [
+            'products' => $products
+        ]);
     }
 
     public function create()
     {
-        $categories = Category::all();
-        $suppliers = Supplier::all();
-        return view('products.create', compact('categories', 'suppliers'));
+        // Mengirim data kategori dan supplier untuk dropdown
+        return Inertia::render('Products/Create', [
+            'categories' => Category::all(),
+            'suppliers' => Supplier::all()
+        ]);
     }
 
     public function store(Request $request)
@@ -41,9 +46,11 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $categories = Category::all();
-        $suppliers = Supplier::all();
-        return view('products.edit', compact('product', 'categories', 'suppliers'));
+        return Inertia::render('Products/Edit', [
+            'product' => $product,
+            'categories' => Category::all(),
+            'suppliers' => Supplier::all()
+        ]);
     }
 
     public function update(Request $request, Product $product)
