@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $guarded = ['id'];
+    use HasFactory;
 
-    public function category() {
-        return $this->belongsTo(Category::class);
-    }
-    public function supplier() {
-        return $this->belongsTo(Supplier::class);
+    // ... (kode asli kamu seperti $fillable, dll biarkan saja) ...
+
+    // TAMBAHKAN KODE INI DI SINI (sebelum kurung kurawal penutup)
+    public function bins()
+    {
+        return $this->belongsToMany(Bin::class)->withPivot('quantity')->withTimestamps();
     }
 }
